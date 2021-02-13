@@ -2,25 +2,24 @@ const app = require('express')()
 const http = require('http').Server(app)
 const io = require('socket.io')(http, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: 'https://hive-git-fuck-p2p.wardmaes.vercel.app',
   },
 })
+const PORT = process.env.PORT || 3001
 
-const port = process.env.PORT || 3001
+
+
+http.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`)
+})
 
 app.get('/', (req, res) => {
   res.send('Hello world')
 })
 
-http.listen(port, () => {
-  console.log(`listening on *:${port}`)
-})
-
 io.on('connection', (socket) => {
   console.log('a user connected', socket.id)
   socket.emit('connected', socket.id)
-
-  let user
 
   socket.on('ROOM.CREATE', (roomId) => {
     console.log('creating room', roomId)
@@ -45,9 +44,9 @@ io.on('connection', (socket) => {
 
   socket.on('disconnecting', (reason) => {
     // TODO: warn other player
-    console.log('disconnection', reason)
-  });
-  
+    console.log('disconnecting', reason)
+  })
+
   socket.on('disconnect', (reason) => {
     console.log('disconnect', reason)
     socket.disconnect(true)
