@@ -8,6 +8,7 @@ const io = require('socket.io')(http, {
 const PORT = process.env.PORT || 3001
 
 
+const gameStates = new Map() // <roomId, context>
 
 http.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`)
@@ -24,17 +25,32 @@ io.on('connection', (socket) => {
   socket.on('ROOM.CREATE', (roomId) => {
     console.log('creating room', roomId)
     socket.join(roomId)
+    gameStates.set(roomId, undefined)
     socket.emit('ROOM.CREATED', roomId)
   })
 
   socket.on('ROOM.JOIN', (roomId) => {
-    console.log('joining room', roomId)
+    console.log('joining room', roomId, gameStates.get(roomId))
     socket.join(roomId)
     socket.emit('ROOM.JOINED', roomId)
+    if (gameStates.get(roomId)) {
+      // TODO: if 2 players already playing, become a spectator
+      console.log('joined, but game already started', gameStates.get(roomId))
+      socket.emit('SYNC', gameStates.get(roomId))
+    }
   })
 
   socket.on('SYNC', (context) => {
-    console.log('sycning', context)
+    console.log('sycning', context, socket.rooms)
+    console.log('gamestates1', gameStates)
+
+    const { roomId } = context
+    if (roomId) {
+      // TODO: this should always be passed
+      gameStates.set(roomId, context)
+    }
+
+    console.log('gamestates2', gameStates)
     socket.broadcast.emit('SYNC', context)
   })
 
@@ -48,7 +64,4 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', (reason) => {
-    console.log('disconnect', reason)
-    socket.disconnect(true)
-  })
-})
+    conso
