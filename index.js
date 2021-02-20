@@ -73,4 +73,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', (reason) => {
-    conso
+    console.log('disconnect', reason)
+    socket.disconnect(true)
+  })
+})
