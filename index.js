@@ -18,6 +18,15 @@ app.get('/', (req, res) => {
   res.send('Hello world')
 })
 
+// This endpoint is called by the matchmaking backend to create a new room
+app.post('/api/rooms', (req, res) => {
+  console.log('POST /api/rooms', req.body)
+  const { roomId } = req.body
+  gameStates.set(roomId, undefined)
+
+  return res.status(200).json({ roomId })
+})
+
 io.on('connection', (socket) => {
   console.log('a user connected', socket.id)
   socket.emit('connected', socket.id)
