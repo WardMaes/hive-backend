@@ -1,4 +1,6 @@
+const bodyParser = require('body-parser')
 const app = require('express')()
+app.use(bodyParser.json({ extended: true }))
 const http = require('http').Server(app)
 const io = require('socket.io')(http, {
   cors: {
@@ -6,7 +8,6 @@ const io = require('socket.io')(http, {
   },
 })
 const PORT = process.env.PORT || 3001
-
 
 const gameStates = new Map() // <roomId, context>
 
